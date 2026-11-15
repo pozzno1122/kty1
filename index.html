@@ -12,16 +12,16 @@
         <h2>ទូទាត់ប្រាក់តាម ABA KHQR</h2>
         <p style="color: #666; margin-bottom: 20px;">ចំនួនទឹកប្រាក់: <strong style="color: #008080;">$10.00</strong></p>
         
-        <!-- ប៊ូតុងសម្រាប់ចុចយក QR Code -->
+        <!-- ប៊ូតុងចុច -->
         <button id="pay-btn" style="padding: 12px 24px; background: #008080; color: white; border: none; font-size: 16px; border-radius: 6px; cursor: pointer; width: 100%;">
             បង្កើត QR Code បង់ប្រាក់
         </button>
 
-        <!-- កន្លែងសម្រាប់បង្ហាញរូបភាព QR Code -->
+        <!-- កន្លែងបង្ហាញរូបភាព QR -->
         <div id="qr-container" style="margin-top: 20px; display: none;">
             <p style="font-weight: bold; color: #333; margin-bottom: 10px;">សូមស្កេនដើម្បីទូទាត់៖</p>
             <img id="qr-image" src="" alt="ABA KHQR" style="width: 220px; height: 220px; border: 1px solid #ddd; border-radius: 8px; padding: 5px;"><br><br>
-            <a id="deeplink-btn" href="" target="_blank" style="display: inline-block; background: #FF6600; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold; display: none;">បើកក្នុងកម្មវិធី ABA Mobile</a>
+            <a id="deeplink-btn" href="" target="_blank" style="display: none; background: #FF6600; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">បើកក្នុងកម្មវិធី ABA Mobile</a>
         </div>
     </div>
 
@@ -56,7 +56,7 @@
                 let data = await response.json();
 
                 if (data.qrImage) {
-                    // កំណត់ទិន្នន័យรูបភាព QR Code ចូលទៅក្នុង tag <img>
+                    // បញ្ចូលរូបភាព QR Code ទៅក្នុង tag img
                     document.getElementById('qr-image').src = data.qrImage;
                     
                     if (data.abamobilebank) {
@@ -65,7 +65,7 @@
                         deeplinkBtn.style.display = 'inline-block';
                     }
 
-                    // បង្ហាញกล่อง QR Code និងលាក់ប៊ូតុងដើម
+                    // បង្ហាញกล่อง QR និងលាក់ប៊ូតុងដើម
                     document.getElementById('qr-container').style.display = 'block';
                     document.getElementById('pay-btn').style.display = 'none';
                 } else {

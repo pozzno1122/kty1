@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ABA PayWay KHQR Checkout</title>
-    <!-- បណ្ណាល័យគណនា Hash -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 </head>
 <body style="font-family: sans-serif; text-align: center; margin-top: 50px; background-color: #f7f7f7;">
@@ -13,12 +12,12 @@
         <h2>ទូទាត់ប្រាក់តាម ABA KHQR</h2>
         <p style="color: #666; margin-bottom: 20px;">ចំនួនទឹកប្រាក់: <strong style="color: #008080;">$10.00</strong></p>
         
-        <!-- ប៊ូតុងចុចបង្កើត QR -->
+        <!-- ប៊ូតុងទូទាត់សុទ្ធ គ្មាន Form យោងទៅណាទេ -->
         <button id="pay-btn" style="padding: 12px 24px; background: #008080; color: white; border: none; font-size: 16px; border-radius: 6px; cursor: pointer; width: 100%;">
-            បង្កើត QR Code បង់ប្រាក់
+            បង់ប្រាក់ឥឡូវនេះ (KHQR)
         </button>
 
-        <!-- កន្លែងបង្ហាញរូបភាព QR Code ពិតប្រាកដ -->
+        <!-- កន្លែងបង្ហាញ QR Code -->
         <div id="qr-container" style="margin-top: 20px; display: none;">
             <p style="font-weight: bold; color: #333; margin-bottom: 10px;">សូមស្កេនដើម្បីទូទាត់៖</p>
             <img id="qr-image" src="" alt="ABA KHQR" style="width: 220px; height: 220px; border: 1px solid #ddd; border-radius: 8px; padding: 5px;"><br><br>
@@ -57,7 +56,6 @@
                 let data = await response.json();
 
                 if (data.qrImage) {
-                    // เอา qrImage មកដាក់ចូលក្នុង tag img ផ្ទាល់
                     document.getElementById('qr-image').src = data.qrImage;
                     
                     if (data.abamobilebank) {
@@ -66,7 +64,6 @@
                         deeplinkBtn.style.display = 'inline-block';
                     }
 
-                    // បង្ហាញกล่อง QR និងលាក់ប៊ូតុងដើម
                     document.getElementById('qr-container').style.display = 'block';
                     document.getElementById('pay-btn').style.display = 'none';
                 } else {

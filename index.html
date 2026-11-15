@@ -3,33 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ABA PayWay Mobile Test</title>
+    <title>ABA PayWay KHQR Checkout</title>
     <!-- ផ្ទុកបណ្ណាល័យគណនា Hash -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 </head>
-<body style="font-family: sans-serif; text-align: center; margin-top: 80px; background-color: #f7f7f7;">
+<body style="font-family: sans-serif; text-align: center; margin-top: 50px; background-color: #f7f7f7;">
 
-    <div style="background: white; padding: 30px; border-radius: 10px; display: inline-block; box-shadow: 0 2px 10px rgba(0,0,0,0.1); max-width: 400px; width: 100%;">
-        <h2>តេស្តទូទាត់ ABA PayWay</h2>
-        <p style="color: #666; margin-bottom: 20px;">ចំនួនទឹកប្រាក់: <strong>$10.00</strong></p>
+    <div style="background: white; padding: 30px; border-radius: 12px; display: inline-block; box-shadow: 0 4px 10px rgba(0,0,0,0.1); max-width: 400px; width: 100%;">
+        <h2>ទូទាត់ប្រាក់តាម ABA KHQR</h2>
+        <p style="color: #666; margin-bottom: 20px;">ចំនួនទឹកប្រាក់: <strong style="color: #008080;">$10.00</strong></p>
         
-        <!-- ABA PayWay Form បាញ់ទិន្នន័យទៅកាន់ Sandbox API ផ្ទាល់ -->
-        <form id="aba_merchant_request" method="POST" action="https://checkout-sandbox.payway.com.kh/api/payment-gateway/v1/payments/purchase">
-            <input type="hidden" name="hash" id="hash" value="">
-            <input type="hidden" name="tran_id" id="tran_id" value="">
-            <input type="hidden" name="amount" id="amount" value="">
-            <input type="hidden" name="req_time" id="req_time" value="">
-            <input type="hidden" name="merchant_id" id="merchant_id" value="ec480530">
-            <input type="hidden" name="items" id="items" value="">
-            
-            <button type="button" id="pay-btn" style="padding: 12px 24px; background: #008080; color: white; border: none; font-size: 16px; border-radius: 5px; cursor: pointer; width: 100%;">
-                បង់ប្រាក់ឥឡូវនេះ (KHQR)
-            </button>
-        </form>
+        <!-- ប៊ូតុងសម្រាប់ចុចយក QR Code -->
+        <button id="pay-btn" style="padding: 12px 24px; background: #008080; color: white; border: none; font-size: 16px; border-radius: 6px; cursor: pointer; width: 100%;">
+            បង្កើត QR Code បង់ប្រាក់
+        </button>
+
+        <!-- កន្លែងសម្រាប់បង្ហាញរូបភាព QR Code ពេលទាញបាន -->
+        <div id="qr-container" style="margin-top: 20px; display: none;">
+            <p style="font-weight: bold; color: #333; margin-bottom: 10px;">សូមស្កេនដើម្បីទូទាត់៖</p>
+            <img id="qr-image" src="" alt="ABA KHQR" style="width: 220px; height: 220px; border: 1px solid #ddd; border-radius: 8px; padding: 5px;"><br><br>
+            <a id="deeplink-btn" href="" target="_blank" style="display: inline-block; background: #FF6600; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">បើកក្នុងកម្មវិធី ABA Mobile</a>
+        </div>
     </div>
 
     <script>
-        document.getElementById('pay-btn').addEventListener('click', function () {
+        document.getElementById('pay-btn').addEventListener('click', async function () {
             const merchant_id = "ec480530";
             const api_key = "FDCB5F572548AF9C2C08FEE4949D8C5A04842620";
             
@@ -42,15 +40,44 @@
             let hash_string = req_time + merchant_id + tran_id + amount + items;
             let hash = CryptoJS.enc.Base64.stringify(CryptoJS.HmacSHA512(hash_string, api_key));
 
-            // ញាត់តម្លៃចូលទៅក្នុង Form Inputs
-            document.getElementById('req_time').value = req_time;
-            document.getElementById('tran_id').value = tran_id;
-            document.getElementById('amount').value = amount;
-            document.getElementById('items').value = items;
-            document.getElementById('hash').value = hash;
+            // រៀបចំទិន្នន័យបញ្ជូនទៅ API
+            let formData = new URLSearchParams();
+            formData.append('merchant_id', merchant_id);
+            formData.append('req_time', req_time);
+            formData.append('tran_id', tran_id);
+            formData.append('amount', amount);
+            formData.append('items', items);
+            formData.append('hash', hash);
 
-            // Submit Form ទៅកាន់ ABA PayWay ផ្ទាល់
-            document.getElementById('aba_merchant_request').submit();
+            try {
+                let response = await fetch('https://checkout-sandbox.payway.com.kh/api/payment-gateway/v1/payments/purchase', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: formData
+                });
+
+                let data = await response.json();
+
+                if (data.qrImage) {
+                    // បង្ហាញរូបភាព QR Code ដែលទទួលបានពី API
+                    document.getElementById('qr-image').src = data.qrImage;
+                    
+                    // បើមាន Deep link សម្រាប់បើក App ផ្ទាល់
+                    if (data.abamobilebank) {
+                        let deeplinkBtn = document.getElementById('deeplink-btn');
+                        deeplinkBtn.href = data.abamobilebank;
+                        deeplinkBtn.style.display = 'inline-block';
+                    }
+
+                    // បើកបង្ហាញกล่อง QR
+                    document.getElementById('qr-container').style.display = 'block';
+                    document.getElementById('pay-btn').style.display = 'none';
+                } else {
+                    alert("កំហុសឆ្គង៖ " + JSON.stringify(data));
+                }
+            } catch (error) {
+                alert("Connection Error: " + error.message);
+            }
         });
     </script>
 </body>
